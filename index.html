@@ -13,16 +13,21 @@
   <ul id="notices"></ul>
 
   <script>
-    fetch("https://raw.githubusercontent.com/Lakshmad-cs/artha-notice-board/main/notices.json")
-      .then(res => res.json())
-      .then(data => {
-        const list = document.getElementById("notices");
-        data.forEach(notice => {
-          const li = document.createElement("li");
-          li.textContent = notice;
-          list.appendChild(li);
-        });
+  fetch("https://raw.githubusercontent.com/Lakshmad-cs/artha-notice-board/main/notices.json")
+    .then(res => res.json())
+    .then(data => {
+      const list = document.getElementById("notices");
+      data.forEach(notice => {
+        const li = document.createElement("li");
+        li.textContent = notice;
+        list.appendChild(li);
       });
-  </script>
+    })
+    .catch(error => {
+      document.getElementById("notices").innerHTML = "<li>⚠️ Could not load notices.</li>";
+      console.error(error);
+    });
+</script>
+
 </body>
 </html>
