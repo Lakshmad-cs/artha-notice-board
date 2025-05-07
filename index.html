@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Notice Board</title>
+  <style>
+    body { font-family: Arial; padding: 20px; text-align: center; }
+    li { background: #f1f1f1; margin: 10px; padding: 15px; border-radius: 5px; }
+    ul { list-style: none; padding: 0; max-width: 600px; margin: auto; }
+  </style>
+</head>
+<body>
+  <h1>Notice Board</h1>
+  <ul id="notices"></ul>
+
+  <script>
+    fetch("https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/artha-notice-board/main/notices.json")
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById("notices");
+        data.forEach(notice => {
+          const li = document.createElement("li");
+          li.textContent = notice;
+          list.appendChild(li);
+        });
+      });
+  </script>
+</body>
+</html>

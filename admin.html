@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teacher Notice Panel</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: auto; padding: 30px; }
+    textarea, input { width: 100%; padding: 10px; margin: 10px 0; }
+    button { padding: 10px 20px; }
+  </style>
+</head>
+<body>
+
+  <h2>Add New Notice</h2>
+  <textarea id="newNotice" rows="4" placeholder="Type your notice here..."></textarea>
+  <button onclick="submitNotice()">Submit Notice</button>
+
+  <p id="status"></p>
+
+  <script>
+    const token = "PASTE_YOUR_GITHUB_TOKEN_HERE";
+    const username = "YOUR_GITHUB_USERNAME";
+    const repo = "artha-notice-board"; // change to your repo name
+    const filePath = "notices.json";
+
+    async function submitNotice() {
+      const newNotice = document.getElementById("newNotice").value.trim();
+      if (!newNotice) return alert("Please write something!");
+
+      // 1. Get current content
+      const res = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${filePath}`, {
+        headers: { Authorization: `token ${token}` }
+      });
+      const file = await res.json();
+      const content = JSON.parse(atob(file.content));
+
+      // 2. Add new notice
+      content.unshift(newNotice);
+
+      // 3. Update file on GitHub
+      const updatedContent = btoa(JSON.stringify(content, null, 2));
+      const update = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${filePath}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "New notice added",
+          content: updatedContent,
+          sha: file.sha
+        })
+      });
+
+      if (update.ok) {
+        document.getElementById("status").textContent = "✅ Notice added!";
+        document.getElementById("newNotice").value = "";
+      } else {
+        document.getElementById("status").textContent = "❌ Failed to add notice.";
+      }
+    }
+  </script>
+</body>
+</html>
