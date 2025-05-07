@@ -23,46 +23,32 @@
     const filePath = "notices.json";
 
     async function submitNotice() {
-      const update = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${filePath}`, {
-  method: "PUT",
-  headers: {
-    Authorization: `token ${token}`,
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    message: "New notice added",
-    content: updatedContent,
-    sha: file.sha
-  })
-});
+<script>
+  const token = "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";
+  const username = "Lakshmad-cs";
+  const repo = "artha-notice-board";
+  const filePath = "notices.json";
 
-const result = await update.json();
-console.log("GitHub API Response:", result);
+  async function submitNotice() {
+    const newNotice = document.getElementById("newNotice").value.trim();
+    if (!newNotice) return alert("Please write something!");
 
-if (update.ok) {
-  document.getElementById("status").textContent = "✅ Your notice was successfully added!";
-  document.getElementById("newNotice").value = "";
-} else {
-  document.getElementById("status").textContent = "❌ Failed to add notice.";
-}
-
-      
-      const newNotice = document.getElementById("newNotice").value.trim();
-      if (!newNotice) return alert("Please write something!");
-
-      // 1. Get current content
+    try {
+      // 1. Get existing notices.json content
       const res = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${filePath}`, {
         headers: { Authorization: `token ${token}` }
       });
       const file = await res.json();
       const content = JSON.parse(atob(file.content));
 
-      // 2. Add new notice
+      // 2. Add new notice to beginning
       content.unshift(newNotice);
 
-      // 3. Update file on GitHub
+      // 3. Encode updated content
       const updatedContent = btoa(JSON.stringify(content, null, 2));
-      const update = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${filePath}`, {
+
+      // 4. PUT to GitHub
+      const updateRes = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${filePath}`, {
         method: "PUT",
         headers: {
           Authorization: `token ${token}`,
@@ -75,12 +61,22 @@ if (update.ok) {
         })
       });
 
-      if (update.ok) {
-        document.getElementById("status").textContent = "✅ Notice added!";
+      const result = await updateRes.json();
+      console.log("GitHub Update Response:", result);
+
+      if (updateRes.ok) {
+        document.getElementById("status").textContent = "✅ Your notice was successfully added!";
         document.getElementById("newNotice").value = "";
       } else {
-        document.getElementById("status").textContent = "❌ Failed to add notice.";
+        document.getElementById("status").textContent = "❌ Failed: " + result.message;
       }
+    } catch (err) {
+      console.error("Error:", err);
+      document.getElementById("status").textContent = "❌ Error: " + err.message;
+    }
+  }
+</script>
+
     }
   </script>
 </body>
