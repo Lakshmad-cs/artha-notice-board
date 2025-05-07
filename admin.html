@@ -28,23 +28,18 @@
 
   try {
     // 1. Get existing notices.json content
-    const res = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${filePath}`, {
-      headers: { Authorization: `token ${token}` }
-    });
+const res = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${filePath}`, {
+  headers: { Authorization: `token ${token}` }
+});
 
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error("GitHub Error: " + errorData.message);
-    }
+if (!res.ok) {
+  const error = await res.json();
+  throw new Error("GitHub error: " + error.message);  // Prevents atob() from running on error
+}
 
-    const file = await res.json();
-    const content = JSON.parse(atob(file.content));
+const file = await res.json();
+const content = JSON.parse(atob(file.content));
 
-    // 2. Add new notice to beginning
-    content.unshift(newNotice);
-
-    // 3. Encode updated content
-    const updatedContent = btoa(JSON.stringify(content, null, 2));
 
     // 4. PUT to GitHub
     const updateRes = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${filePath}`, {
