@@ -23,6 +23,30 @@
     const filePath = "notices.json";
 
     async function submitNotice() {
+      const update = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${filePath}`, {
+  method: "PUT",
+  headers: {
+    Authorization: `token ${token}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    message: "New notice added",
+    content: updatedContent,
+    sha: file.sha
+  })
+});
+
+const result = await update.json();
+console.log("GitHub API Response:", result);
+
+if (update.ok) {
+  document.getElementById("status").textContent = "✅ Your notice was successfully added!";
+  document.getElementById("newNotice").value = "";
+} else {
+  document.getElementById("status").textContent = "❌ Failed to add notice.";
+}
+
+      
       const newNotice = document.getElementById("newNotice").value.trim();
       if (!newNotice) return alert("Please write something!");
 
